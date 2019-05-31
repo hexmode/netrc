@@ -56,16 +56,22 @@ class Netrc
             $filename = self::getDefaultPath();
             if ($filename === false) {
                 throw new FileNotFoundException(
-                    "HOME environment variable must be set for correctly netrc handling"
+                    "HOME environment variable must be set if no filename is given."
                 );
             }
         }
-        $filename = realpath($filename);
+        $realFilename = realpath($filename);
+
+        if ( !$realFilename || !file_exists( $realFilename ) ) {
+            throw new FileNotFoundException(
+                "The netrc path ($filename) does not resolve to an actual file."
+            );
+        }
 
         // check that netrc file is available
-        if (!is_readable($filename) || !$content = file_get_contents($filename)) {
+        if (!is_readable($realFilename) || !$content = file_get_contents($realFilename)) {
             throw new FileNotFoundException(
-                "netrc file ($filename) does not exist or is not readable"
+                "netrc file ($realFilename) does not exist or is not readable"
             );
         }
 
