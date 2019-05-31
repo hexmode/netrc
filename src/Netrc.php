@@ -12,7 +12,7 @@
 
 namespace Fduch\Netrc;
 
-use Fduch\Netrc\Exception\ParseException;
+use Fduch\Netrc\Exception\FileNotFoundException;
 
 /**
  * Netrc manager
@@ -30,7 +30,7 @@ class Netrc
     public static function getDefaultPath() {
         $homePath = getenv('HOME');
         if (!homePath) {
-            throw new ParseException(
+            throw new FileNotFoundException(
                 "HOME environment variable must be set for correctly netrc handling"
             );
         }
@@ -60,8 +60,10 @@ class Netrc
         $filename = realpath($filename);
 
         // check that netrc file is available
-        if (!file_exists($filename) || !is_readable($filename) || !$content = file_get_contents($filename)) {
-            throw new ParseException("netrc file does not exist or is not readable");
+        if (!is_readable($filename) || !$content = file_get_contents($filename)) {
+            throw new FileNotFoundException(
+                "netrc file ($filename) does not exist or is not readable"
+            );
         }
 
         // parse file
@@ -69,4 +71,3 @@ class Netrc
         return $parser->parse($content);
     }
 }
- 
