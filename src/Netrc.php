@@ -30,9 +30,7 @@ class Netrc
     public static function getDefaultPath() {
         $homePath = getenv('HOME');
         if (!homePath) {
-            throw new FileNotFoundException(
-                "HOME environment variable must be set for correctly netrc handling"
-            );
+            return false;
         }
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $filename = strtr($homePath, '\\', '/') . '/_netrc';
@@ -56,6 +54,11 @@ class Netrc
         // fetch netrc filename if it is not specified
         if (!$filename) {
             $filename = self::getDefaultPath();
+            if ($filename === false) {
+                throw new FileNotFoundException(
+                    "HOME environment variable must be set for correctly netrc handling"
+                );
+            }
         }
         $filename = realpath($filename);
 
