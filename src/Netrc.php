@@ -29,7 +29,7 @@ class Netrc
      */
     public static function getDefaultPath() {
         $homePath = getenv('HOME');
-        if (!homePath) {
+        if (!$homePath) {
             return false;
         }
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
