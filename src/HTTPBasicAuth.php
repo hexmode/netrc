@@ -21,15 +21,30 @@
 namespace Fduch\Netrc;
 
 use Psr\Http\Message\RequestInterface;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
 use Hexmode\HTTPBasicAuth\Client;
 
 class HTTPBasicAuth extends Client {
-    protected $netrc;
+    protected $cred;
     /**
      * @param string $url
      * @param string $netrcFile
      */
     public function __construct( string $netrcFile = null ) {
-        $this->netrc = new Netrc( $netrcFile );
+        $this->cred = Netrc::parse( $netrcFile );
     }
+
+	public function getRequestMapper() {
+		return Middleware::mapRequest(
+			function ( Request $request ) {
+				if ( $this->realm ) {
+					var_dump( $realm );
+					exit;
+				}
+				return $request;
+			}
+		);
+	}
+
 }
