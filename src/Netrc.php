@@ -45,7 +45,8 @@ class Netrc
      *
      * @param string|null $filename
      *
-     * @throws ParseException when netrc file could not be read or parsed
+     * @throws FileNotFoundException when netrc file could not be read
+     * @throws ParseException when there is a problem parsing the file.
      *
      * @return array of netrc values grouped by machines
      */
