@@ -26,25 +26,32 @@ use GuzzleHttp\Psr7\Request;
 use Hexmode\HTTPBasicAuth\Client;
 
 class HTTPBasicAuth extends Client {
-    protected $cred;
-    /**
-     * @param string $url
-     * @param string $netrcFile
-     */
-    public function __construct( string $netrcFile = null ) {
-        $this->cred = Netrc::parse( $netrcFile );
-    }
+	protected $netrc;
+	protected $originalFile;
+	/**
+	 * @param string $url
+	 * @param string $netrcFile
+	 */
+	public function __construct( string $netrcFile = null ) {
+		$this->originalFile = $netrcFile;
+		$this->netrc = Netrc::parse( $netrcFile );
+	}
 
 	public function getRequestMapper() {
 		return Middleware::mapRequest(
 			function ( Request $request ) {
-				if ( $this->realm ) {
-					var_dump( $realm );
-					exit;
+				$uri = $request->getUri();
+				$host = $uri->getHost();
+				if ( isset( $this->netrc[$host] ) ) {
+					return $request->withUri(
+						$uri->withUserInfo(
+							$this->netrc[$host]['login'],
+							$this->netrc[$host]['password']
+						)
+					);
 				}
 				return $request;
 			}
 		);
 	}
-
 }
