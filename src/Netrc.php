@@ -25,12 +25,12 @@ class Netrc
      * Get the default path of the netrc file that will be used if one
      * is not provided.
      *
-     * @return string
+     * @return null|string
      */
-    public static function getDefaultPath() {
+    public static function getDefaultPath() :?string {
         $homePath = getenv('HOME');
         if (!$homePath) {
-            return false;
+            return null;
         }
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $filename = strtr($homePath, '\\', '/') . '/_netrc';
@@ -55,7 +55,7 @@ class Netrc
         // fetch netrc filename if it is not specified
         if (!$filename) {
             $filename = self::getDefaultPath();
-            if ($filename === false) {
+            if (!$filename) {
                 throw new FileNotFoundException(
                     "HOME environment variable must be set if no filename is given."
                 );

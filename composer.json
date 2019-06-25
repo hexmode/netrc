@@ -13,11 +13,14 @@
     ],
     "require": {
         "php": ">=7",
-		"guzzlehttp/guzzle": "~6.0",
+        "guzzlehttp/guzzle": "~6.0",
         "hexmode/http-basic-auth": "dev-master"
     },
     "require-dev": {
-        "phpunit/phpunit": "~3.7.0"
+        "phpunit/phpunit": "~3.7.0",
+        "vimeo/psalm": "*",
+        "mediawiki/mediawiki-codesniffer": "*",
+        "jakub-onderka/php-parallel-lint": "*"
     },
     "autoload": {
         "psr-4": { "Fduch\\Netrc\\": "src/" }

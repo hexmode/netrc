@@ -26,32 +26,52 @@ use GuzzleHttp\Psr7\Request;
 use Hexmode\HTTPBasicAuth\Client;
 
 class HTTPBasicAuth extends Client {
-	protected $netrc;
+	/** @var string $originalFile */
 	protected $originalFile;
 	/**
 	 * @param string $url
 	 * @param string $netrcFile
 	 */
 	public function __construct( string $netrcFile = null ) {
-		$this->originalFile = $netrcFile;
-		$this->netrc = Netrc::parse( $netrcFile );
+		if ( $netrcFile ) {
+			$this->originalFile = $netrcFile;
+		} else {
+			$this->originalFile = Netrc::getDefaultPath();
+		}
+		$this->cred = Netrc::parse( $netrcFile );
 	}
 
-	public function getRequestMapper() {
+	public function getRequestMapper() :callable {
 		return Middleware::mapRequest(
 			function ( Request $request ) {
 				$uri = $request->getUri();
 				$host = $uri->getHost();
-				if ( isset( $this->netrc[$host] ) ) {
+				if ( isset( $this->cred[$host] ) ) {
 					return $request->withUri(
 						$uri->withUserInfo(
-							$this->netrc[$host]['login'],
-							$this->netrc[$host]['password']
+							$this->getUsername( (string)$uri ),
+							$this->getPassword( (string)$uri )
 						)
 					);
 				}
 				return $request;
 			}
 		);
+	}
+
+	protected function getHost( string $url ) :?string {
+		$parts = parse_url( $url );
+		if ( $parts && isset( $parts['host'] ) ) {
+			return $parts['host'];
+		}
+		return null;
+	}
+
+	public function getUsername( string $url ) :string {
+		return $this->cred[$this->getHost( $url )]['login'] ?? '';
+	}
+
+	public function getPassword( string $url ) :string {
+		return $this->cred[$this->getHost( $url )]['password'] ?? '';
 	}
 }

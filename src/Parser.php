@@ -91,13 +91,18 @@ class Parser
         foreach ($lines as $line) {
             // throwing tokens after '#' sign
             $commentCharPosition = strpos($line, "#");
-            $lineWithoutComments = ($commentCharPosition === false) ? $line : substr($line, 0, strpos($line, "#"));
+            $lineWithoutComments = ($commentCharPosition === false)
+								 ? $line
+								 : substr($line, 0, strpos($line, "#"));
             // storing current line tokens
             if ($lineWithoutComments) {
-                $tokens = array_merge($tokens, preg_split('/\s+/', $lineWithoutComments, -1, PREG_SPLIT_NO_EMPTY));
+                $tokens = array_merge(
+					$tokens, preg_split(
+						'/\s+/', $lineWithoutComments, -1, PREG_SPLIT_NO_EMPTY
+					)
+				);
             }
         }
         return $tokens;
     }
 }
- 
